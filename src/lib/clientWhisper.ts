@@ -53,13 +53,17 @@ async function getASRPipeline(): Promise<ASRPipeline> {
 export async function transcribeOffline(blob: Blob): Promise<string> {
   const audio = await decodeToMono16k(blob);
   const asr = await getASRPipeline();
+
   const output = await asr(audio, {
-    chunk_length_s: 30,
-    stride_length_s: 5,
     language: "english",
     task: "transcribe",
   });
+
   const text = output?.text?.trim();
-  if (!text) throw new Error("On-device transcription returned no text");
+
+  if (!text) {
+    throw new Error("On-device transcription returned no text");
+  }
+
   return text;
 }
